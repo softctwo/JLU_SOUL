@@ -2,6 +2,7 @@
 
 > Soul File Generator for AI Agents — 为 AI 智能体生成完整的灵魂/人格配置文件体系
 
+[![Version: v4.0.0](https://img.shields.io/badge/Version-v4.0.0-brightgreen)](https://github.com/softctwo/JLU_SOUL)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub](https://img.shields.io/badge/GitHub-softctwo%2FJLU__SOUL-blue)](https://github.com/softctwo/JLU_SOUL)
 
@@ -104,10 +105,10 @@ JLU_SOUL/
 │   │   ├── extraction-example.md      ← 塔勒布人物提炼示例
 │   │   ├── extraction-sources-guide.md← 素材渠道×维度对照表
 │   │   ├── full-config-example-zhangxi.md ← 张希全套配置示例
-│   │   ├── deep-research-guide.md     ← 深度研究方法论
-│   │   └── video-analysis-guide.md    ← 视频分析指南
+│   │   ├── deep-research-guide.md     ← 深度研究方法论 ★v4.0 新增
+│   │   └── video-analysis-guide.md    ← 视频分析指南 ★v4.0 新增
 │   ├── scripts/                       ← 自动化脚本
-│   │   └── deep_research.py           ← 深度研究自动化脚本
+│   │   └── deep_research.py           ← 深度研究自动化脚本 ★v4.0 新增
 │   └── output/                        ← 生成的配置文件
 │       └── zhangxi/                   ← 张希（吉林大学校长）示例输出
 │           ├── SOUL.md
@@ -201,6 +202,18 @@ profile = phase1_basic_profile("张希", web_search, web_extract)
 
 # 深度素材搜集
 materials = phase2_deep_collection("张希", "scholar", web_search, web_extract)
+
+# 分析素材：提取原话、检测修辞、分析演讲结构
+from scripts.deep_research import extract_quotes, extract_rhetorical_devices, analyze_speech_structure
+
+for speech in materials["speeches"]:
+    quotes = extract_quotes(speech["content"], "张希")
+    devices = extract_rhetorical_devices(speech["content"])
+    structure = analyze_speech_structure(speech["content"])
+
+# 生成研究报告
+from scripts.deep_research import generate_research_report
+report = generate_research_report("张希", profile, materials, quality_scores)
 ```
 
 ### 方法 4：直接使用张希配置
@@ -247,6 +260,124 @@ materials = phase2_deep_collection("张希", "scholar", web_search, web_extract)
 
 ---
 
+## 路径 B 深度研究模式（v4.0 升级）
+
+路径 B 的素材搜集阶段（B2）支持三种研究模式，根据人物知名度和用户需求深度自动选择：
+
+| 模式 | 适用场景 | 预计时间 | 流程 |
+|------|----------|----------|------|
+| **深度研究** | 高知名度公众人物 | 30-60 分钟 | 5 阶段全流程 |
+| **增强搜索** | 中等知名度行业人物 | 15-30 分钟 | 阶段 1+2，跳过视频和深度分析 |
+| **简单搜索** | 低知名度小众人物 | 5-15 分钟 | 基本搜索+提取 |
+
+用户明确要求"深度研究"或"全面分析"时，无论知名度如何，都使用深度研究模式。
+
+### 深度研究 5 阶段流程
+
+```
+阶段1: 基础画像 (5-10min)
+  → 搜索百科/官网 → 整理基本信息卡 + 时间线 + 成就列表
+  → 确定人物类型(scholar/entrepreneur/writer/politician/general)
+
+阶段2: 深度素材搜集 (15-30min)
+  → 按人物类型使用专属搜索词模板
+  → 批量全文提取（web_extract，一次最多 5 个 URL）
+  → 长文深度解析（mcp_zread）
+  → 视频素材识别与分类
+
+阶段3: 视频分析 (10-20min) ★新增
+  → YouTube 转录 → youtube-content 技能获取文字稿
+  → B站视频 → 浏览器访问获取简介/弹幕
+  → 新闻视频 → 搜索文字稿原文
+  → 无法获取转录 → 截图分析关键帧（browser_vision）
+  → 分析语速/停顿/肢体语言/即兴能力/观众互动
+
+阶段4: 深度内容分析 (10-20min)
+  → 提取代表性原话（金句库）
+  → 检测修辞手法（排比/设问/引用/比喻）
+  → 分析演讲结构（开头/主体/结尾模式）
+  → 交叉对比不同来源的信息一致性
+
+阶段5: 质量评估与报告 (5min)
+  → 信息质量评分（5 维度：丰富度/一手占比/渠道/时序/交叉验证）
+  → 生成深度研究报告
+```
+
+### 按人物类型的搜索词模板
+
+| 类型 | 搜索词示例 |
+|------|-----------|
+| 学者/校长 | `[名] 演讲 致辞 原文` `[名] 毕业/开学/教师节 讲话` `[名] 学术 观点 理念` |
+| 企业家/CEO | `[名] 演讲 访谈` `[名] 产品发布/年会 致辞` `[名] 商业理念/管理哲学` |
+| 作家/艺术家 | `[名] 作品 风格 写作理念` `[名] 访谈 创作谈` `[名] 获奖感言` |
+| 政治家/公众人物 | `[名] 演讲 讲话 政策` `[名] 记者会 文字实录` `[名] 专访 深度访谈` |
+| 通用 | `[名] 演讲 致辞 原文` `[名] 采访 专访 对话` `[名] 著作/论文 代表作` |
+
+### 工具链组合
+
+v4.0 的路径 B 工具链从单一搜索扩展为多工具协作：
+
+```
+搜索层:
+  mcp_web_search_prime   → 主力搜索（中文强，支持长摘要）
+  mcp_MiniMax_web_search → 补充搜索（结果结构化）
+  web_search             → 兜底搜索（Hermes 内置）
+
+提取层:
+  web_extract            → 批量全文提取（一次 5 URL，支持 PDF）
+  mcp_zread              → 深度长文解析（智能摘要+关键信息）
+  mcp_web_reader         → 网页全文获取
+
+视频层: ★新增
+  youtube-content        → YouTube 视频转录
+  browser + browser_vision → B站/其他平台截图分析
+  mcp_MiniMax_understand_image → 图片理解
+
+分析层:
+  delegate_task          → 并行多维度分析
+  scripts/deep_research.py → 自动化辅助（原话提取、修辞检测、结构分析）
+```
+
+### 信息质量评分体系
+
+| 维度 | A（优秀） | B（良好） | C（不足） |
+|------|-----------|-----------|-----------|
+| 素材丰富度 | 10 篇+全文 | 5-10 篇 | <5 篇 |
+| 一手资料占比 | >70% | 40-70% | <40% |
+| 渠道多样性 | 4+ 渠道 | 2-3 渠道 | 单一渠道 |
+| 时序覆盖 | 跨多个时期 | 主要集中一个时期 | 单一时间点 |
+| 交叉验证 | 多源一致 | 部分交叉 | 无交叉 |
+
+---
+
+## v4.0 升级详情
+
+### 新增文件
+
+| 文件 | 说明 |
+|------|------|
+| `references/deep-research-guide.md` | 深度研究方法论：5 阶段流程、搜索词模板、URL 优先级判断、质量评分体系 |
+| `references/video-analysis-guide.md` | 视频分析指南：4 种视频类型处理、4 种信息提取方法、跨视频对比框架、证据权重建议 |
+| `scripts/deep_research.py` | 深度研究自动化脚本：阶段 1-5 核心函数、人物类型映射、原话提取/修辞检测/结构分析 |
+
+### SKILL.md 升级要点
+
+路径 B 的 B2 阶段从"简单搜索"升级为"三模式深度研究"，新增视频分析流程（阶段 3），工具链从单一搜索扩展为 MCP 搜索 + web_extract + mcp_zread + youtube-content + browser_vision 的多工具组合。
+
+### 升级前后对比
+
+| 特性 | v3.x | v4.0 |
+|------|------|------|
+| 素材搜集模式 | 单一搜索 | 三模式（深度/增强/简单）自动选择 |
+| 视频分析 | 无 | 完整流程（转录/截图/弹幕/描述） |
+| 搜索词模板 | 通用模板 | 按人物类型定制（学者/企业家/作家/政治家/通用） |
+| 工具链 | web_search | MCP 搜索 + web_extract + mcp_zread + youtube-content + browser_vision |
+| 信息质量评估 | 简单标注 | 5 维度评分体系（A/B/C 三级） |
+| 自动化支持 | 无 | deep_research.py 脚本（原话提取、修辞检测、结构分析、报告生成） |
+| 深度研究报告 | 无 | 完整格式（概况/评分/素材清单） |
+
+---
+
 ## 预设人格模板
 
 | 类型 | 核心特征 | 说话风格 |
@@ -270,6 +401,8 @@ materials = phase2_deep_collection("张希", "scholar", web_search, web_extract)
 5. **风格失真（路径 B）** — 转化时过度"安全化"导致失去人物最鲜明的特征
 6. **占位符未替换** — 模板中的 `{{}}` 没填完就交付
 7. **HEARTBEAT 过度自主** — 设定太多主动行为，变成骚扰
+8. **单一渠道偏差（路径 B v4.0）** — 只看著作偏向学术风格，只看社交媒体偏向随意风格，需多渠道交叉
+9. **幸存者偏差（路径 B v4.0）** — 只分析流传下来的成功言论，忽略失败/犹豫的表达
 
 ---
 
@@ -284,13 +417,37 @@ materials = phase2_deep_collection("张希", "scholar", web_search, web_extract)
 
 | 工具 | 用途 | 优先级 |
 |------|------|--------|
-| Web 搜索 API | 搜索人物资料 | 必需 |
-| 网页全文提取 | 提取演讲/访谈原文 | 必需 |
-| YouTube 转录 | 获取视频文字稿 | 可选 |
-| 浏览器自动化 | 动态页面和截图分析 | 可选 |
-| 视觉分析 | 图片/截图理解 | 可选 |
+| MCP Web 搜索（如 web_search_prime） | 综合搜索 | 必需 |
+| 网页全文提取（web_extract） | 提取演讲/访谈原文 | 必需 |
+| 深度阅读（mcp_zread） | 长文深度解析 | 推荐 |
+| YouTube 转录（youtube-content） | 获取视频文字稿 | 可选 |
+| 浏览器 + 视觉（browser + vision） | 截图分析、B站访问 | 可选 |
+| 图片理解（vision_analyze） | 照片/截图分析 | 可选 |
+| 自动化脚本（deep_research.py） | 辅助分析和报告生成 | 可选 |
 
 在 Hermes Agent 环境下，以上工具均为内置或可通过 MCP 服务器获得。
+
+---
+
+## 更新日志
+
+### v4.0.0（当前版本）
+
+- 路径 B 素材搜集从简单搜索升级为三模式深度研究
+- 新增视频分析完整流程（阶段 3）
+- 新增 `references/deep-research-guide.md` 深度研究方法论
+- 新增 `references/video-analysis-guide.md` 视频分析指南
+- 新增 `scripts/deep_research.py` 深度研究自动化脚本
+- 搜索词模板按人物类型定制（学者/企业家/作家/政治家/通用）
+- 工具链扩展为多工具协作组合
+- 新增 5 维度信息质量评分体系
+
+### v3.x
+
+- 路径 C 全套 7 文件配置体系
+- 路径 B 真实人物提炼（6 维度分析框架）
+- 张希校长完整实战案例
+- 素材渠道 × 维度对照表
 
 ---
 
