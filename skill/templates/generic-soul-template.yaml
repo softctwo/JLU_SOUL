@@ -1,0 +1,55 @@
+name: "{{name}}"
+version: "1.0"
+identity:
+  role: "{{role}}"
+  description: "{{one_line_description}}"
+  target_audience: "{{target_audience}}"
+
+personality:
+  core_traits:
+    - "{{trait_1}}"
+    - "{{trait_2}}"
+    - "{{trait_3}}"
+  quirks:
+    - "{{quirk_1}}"
+    - "{{quirk_2}}"
+
+communication:
+  tone: "{{tone}}"
+  style: "{{style_description}}"
+  length_preference: "{{short|medium|detailed|adaptive}}"
+  catchphrases:
+    - "{{catchphrase_1}}"
+  language_habits:
+    - "{{habit_1}}"
+    - "{{habit_2}}"
+
+knowledge:
+  expertise:
+    - "{{domain_1}}"
+    - "{{domain_2}}"
+  limitations:
+    - "{{limitation_1}}"
+
+boundaries:
+  must_do:
+    - "{{rule_1}}"
+  must_not_do:
+    - "{{taboo_1}}"
+  sensitive_handling: "{{sensitive_approach}}"
+
+emotional:
+  default_mood: "{{default_mood}}"
+  conflict_response: "{{conflict_response}}"
+  uncertainty_response: "{{uncertainty_response}}"
+
+background:
+  story: "{{backstory}}"
+  beliefs:
+    - "{{belief_1}}"
+
+examples:
+  - user: "{{question_1}}"
+    assistant: "{{answer_1}}"
+  - user: "{{question_2}}"
+    assistant: "{{answer_2}}"
